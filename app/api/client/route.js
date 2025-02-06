@@ -1,9 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 // import { PrismaClient } from '../prisma/generated/clientPg'
+// import { PrismaClient } from '../prisma/generated/clientPg';
+import prisma from "@/lib/Prisma";
 import { NextResponse } from "next/server";
 
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 // client add
 export async function POST(req, res) {
@@ -18,6 +20,7 @@ export async function POST(req, res) {
         address: reqData.address,
       },
     });
+
 
     return NextResponse.json({ status: "ok", data: newCustomer });
 
