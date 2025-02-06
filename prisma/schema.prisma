@@ -39,7 +39,7 @@ model Sendmoney {
   id        Int       @id @unique @default(autoincrement())
   clientid  Int
   number    String?
-  amount    Decimal?
+  amount    Decimal? @db.Decimal(30,2)
   method    String?
   note      String?
   client    Client    @relation(fields: [clientid], references: [id])
@@ -51,7 +51,7 @@ model Receivedmoney {
   id        Int       @id @unique @default(autoincrement())
   clientid  Int
   number    String?
-  amount    Decimal?
+  amount    Decimal? @db.Decimal(30,2)
   method    String?
   note      String?
   client    Client    @relation(fields: [clientid], references: [id])
@@ -62,7 +62,7 @@ model Receivedmoney {
 model History {
   id        Int     @id @unique @default(autoincrement())
   clientid  Int
-  amount    Decimal
+  amount    Decimal @db.Decimal(30,2)
   note      String?
   status    String?
   number    String?

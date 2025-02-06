@@ -6,20 +6,22 @@ const prisma = new PrismaClient();
 
 
 
-export async function PATCH(req, res) {
+export async function GET(req, res) {
     try {
         const url = new URL(req.url);
         const type = url.searchParams.get('type');
         const page = parseInt(url.searchParams.get("page") || "1"); // Default to page 1 if not provided
         const limit = parseInt(url.searchParams.get("limit") || "10");
 
+        // Calculate offset (skip)
+        const skip = (page - 1) * limit;
         const transactionHistories = await prisma.history.findMany({
             // where:{
             //     NOT: {
             //         clientid:null
             //     }
             // },
-            skip: page,
+            skip: skip,
             take: limit,
             include: {
                 client: {

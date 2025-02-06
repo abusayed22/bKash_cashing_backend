@@ -16,6 +16,7 @@ export async function POST(req, res) {
     const newReceivedMoney = await prisma.receivedmoney.create({
       data: {
         clientid: parseInt(reqData.clientid),
+        number:reqData.number || '', 
         amount: parseFloat(reqData.amount),
         method: reqData.method,
         note: reqData.note || null,
@@ -33,7 +34,6 @@ export async function POST(req, res) {
         method: reqData.method || '',
       },
     });
-    console.log(newHistory)
 
 
     return NextResponse.json({ status: "ok", data: newReceivedMoney }
