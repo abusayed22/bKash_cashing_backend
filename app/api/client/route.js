@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '../prisma/generated/clientPg'
 import { NextResponse } from "next/server";
 
 
