@@ -1,15 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-import bcrypt from 'bcryptjs'; // For password hashing verification
-import { SignJWT } from "jose";
 import { CreateToken } from "@/lib/tokenHelper";
-import { cookies } from "next/headers";
 
 
 const prisma = new PrismaClient();
 
-//secrec key
-const JWT_SECRET = 'apps-key-bkash';
 
 
 export const POST = async (req) => {
