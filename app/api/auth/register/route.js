@@ -23,15 +23,21 @@ export const POST = async (req,res) => {
             return NextResponse.json({ Error: 'User already exists, please login' }, { status: 400 });
         }
 
+
+
+         
         // Create a new user in the database
         const newUser = await prisma.admin.create({
             data: {
-                fullname: dataObj.fullname,
+                fullname: dataObj.fullName,
                 email: dataObj.email,
                 password: dataObj.password, 
-                otp: dataObj.otp,
+                otp: '0',
+                token: ''
             },
         });
+                
+
         return NextResponse.json({ message: 'User created successfully', user: newUser }, { status: 201 });
     } catch (error) {
         // Handle unexpected errors

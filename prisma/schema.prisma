@@ -17,9 +17,10 @@ datasource db {
 model Admin {
   id        Int       @id @unique @default(autoincrement())
   fullname  String?
-  email     String   @unique
+  email     String    @unique
   password  String?
-  otp String 
+  otp       String
+  token     String?
   createdAt DateTime? @default(now())
   updateAt  DateTime? @default(now()) @updatedAt
 }
@@ -41,7 +42,7 @@ model Sendmoney {
   id        Int       @id @unique @default(autoincrement())
   clientid  Int
   number    String?
-  amount    Decimal? @db.Decimal(30,2)
+  amount    Decimal?  @db.Decimal(30, 2)
   method    String?
   note      String?
   client    Client    @relation(fields: [clientid], references: [id])
@@ -53,7 +54,7 @@ model Receivedmoney {
   id        Int       @id @unique @default(autoincrement())
   clientid  Int
   number    String?
-  amount    Decimal? @db.Decimal(30,2)
+  amount    Decimal?  @db.Decimal(30, 2)
   method    String?
   note      String?
   client    Client    @relation(fields: [clientid], references: [id])
@@ -62,13 +63,13 @@ model Receivedmoney {
 }
 
 model History {
-  id        Int     @id @unique @default(autoincrement())
+  id        Int       @id @unique @default(autoincrement())
   clientid  Int
-  amount    Decimal @db.Decimal(30,2)
+  amount    Decimal   @db.Decimal(30, 2)
   note      String?
   status    String?
   number    String?
-  method String ?
+  method    String?
   client    Client    @relation(fields: [clientid], references: [id])
   createdAt DateTime? @default(now())
   updateAt  DateTime? @default(now()) @updatedAt

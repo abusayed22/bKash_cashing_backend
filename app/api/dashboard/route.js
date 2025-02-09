@@ -1,4 +1,5 @@
 // import { PrismaClient } from "@prisma/client";
+import { ResponseMes, verificationAuthor } from "@/lib/Globalfunction";
 import prisma from "@/lib/Prisma";
 import { NextResponse } from "next/server";
 
@@ -7,7 +8,22 @@ import { NextResponse } from "next/server";
 
 
 
-export const GET = async () => {
+export const GET = async (req) => {
+   
+     // ----------------------- Secure Request Without Bearer Token Start--------------------------
+      const headersList = req.headers;
+      const authHeader = headersList.get("authorization");
+    
+      try {
+        const data = await verificationAuthor(authHeader);
+        if (data === false) {
+          return ResponseMes(401, "Unauthorized: Token mismatch or user not found")
+        }
+      } catch (error) {
+        return ResponseMes(401, "Invalid Auth")
+      }
+      // ----------------------- Secure Request Without Bearer Token End --------------------------
+
     try {
         const todayStart = new Date();
         todayStart.setHours(0, 0, 0, 0)
@@ -43,7 +59,7 @@ export const GET = async () => {
         const todayTotalReceivedAmount = todayTotalReceived._sum.amount;
 
 
-        //  today total bKash send amount 
+        //  today total Bank send amount 
         const todayTotalSendbkash = await prisma.history.aggregate({
             _sum: {
                 amount: true
@@ -53,13 +69,13 @@ export const GET = async () => {
                     gte: todayStart,
                     lte: todayEnd
                 },
-                method: 'b',
+                method: 'bank',
                 status: 'Send'
             }
         })
         const todayTotalSendbKashAmount = todayTotalSendbkash._sum.amount;
 
-        //  today total bKash Received amount 
+        //  today total Bank Received amount 
         const todayTotalReceivedbkash = await prisma.history.aggregate({
             _sum: {
                 amount: true
@@ -69,11 +85,43 @@ export const GET = async () => {
                     gte: todayStart,
                     lte: todayEnd
                 },
-                method: 'b',
+                method: 'bank',
                 status: 'Received'
             }
         })
         const todayTotalReceivedbKashAmount = todayTotalReceivedbkash._sum.amount;
+        
+        //  today total Bank send amount 
+        const todayTotalSendBank = await prisma.history.aggregate({
+            _sum: {
+                amount: true
+            },
+            where: {
+                createdAt: {
+                    gte: todayStart,
+                    lte: todayEnd
+                },
+                method: 'bank',
+                status: 'Send'
+            }
+        })
+        const todayTotalSendBankAmount = todayTotalSendBank._sum.amount;
+
+        //  today total Bank Received amount 
+        const todayTotalReceivedBank = await prisma.history.aggregate({
+            _sum: {
+                amount: true
+            },
+            where: {
+                createdAt: {
+                    gte: todayStart,
+                    lte: todayEnd
+                },
+                method: 'bank',
+                status: 'Received'
+            }
+        })
+        const todayTotalReceivedBankAmount = todayTotalReceivedBank._sum.amount;
 
 
         //  today total Nagad Send amount 
@@ -112,6 +160,8 @@ export const GET = async () => {
             status: 'ok', data: {
                 send: todayTotalSendAmount,
                 received: todayTotalReceivedAmount,
+                sendBank: todayTotalSendBankAmount,
+                receivedBank: todayTotalReceivedBankAmount,
                 sendbKash: todayTotalSendbKashAmount,
                 receivedbKash: todayTotalReceivedbKashAmount,
                 sendNagad: todayTotalSendNagadAmount,

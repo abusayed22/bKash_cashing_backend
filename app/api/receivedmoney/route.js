@@ -1,4 +1,5 @@
 // import { PrismaClient } from "@prisma/client";
+import { ResponseMes, verificationAuthor } from "@/lib/Globalfunction";
 import prisma from "@/lib/Prisma";
 import { NextResponse } from "next/server";
 
@@ -9,15 +10,30 @@ import { NextResponse } from "next/server";
 
 
 export async function POST(req, res) {
+
+  // ----------------------- Secure Request Without Bearer Token Start--------------------------
+  const headersList = req.headers;
+  const authHeader = headersList.get("authorization");
+
+  try {
+    const data = await verificationAuthor(authHeader);
+    if (data === false) {
+      return ResponseMes(401, "Unauthorized: Token mismatch or user not found")
+    }
+  } catch (error) {
+    return ResponseMes(401, "Invalid Auth")
+  }
+  // ----------------------- Secure Request Without Bearer Token End --------------------------
+
   try {
 
-    const reqData = await req.json(); // Parse the incoming request JSON data
+    const reqData = await req.json(); 
 
     // Create the Receivedmoney entry first
     const newReceivedMoney = await prisma.receivedmoney.create({
       data: {
         clientid: parseInt(reqData.clientid),
-        number:reqData.number || '', 
+        number: reqData.number || '',
         amount: parseFloat(reqData.amount),
         method: reqData.method,
         note: reqData.note || null,
@@ -30,8 +46,8 @@ export async function POST(req, res) {
         clientid: parseInt(reqData.clientid),
         amount: parseFloat(reqData.amount),
         note: reqData.note || null,
-        status: 'Received', // You can customize the status (e.g., "Received" or "Completed")
-        number: reqData.number || '', // Add the number if available
+        status: 'Received', 
+        number: reqData.number || '',
         method: reqData.method || '',
       },
     });

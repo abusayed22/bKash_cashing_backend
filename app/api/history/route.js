@@ -1,4 +1,5 @@
 // import { PrismaClient } from "@prisma/client";
+import { ResponseMes, verificationAuthor } from "@/lib/Globalfunction";
 import prisma from "@/lib/Prisma";
 import { NextResponse } from "next/server";
 
@@ -8,6 +9,21 @@ import { NextResponse } from "next/server";
 
 
 export async function GET(req, res) {
+
+    // ----------------------- Secure Request Without Bearer Token Start--------------------------
+    const headersList = req.headers;
+    const authHeader = headersList.get("authorization");
+
+    try {
+        const data = await verificationAuthor(authHeader);
+        if (data === false) {
+            return ResponseMes(401, "Unauthorized: Token mismatch or user not found")
+        }
+    } catch (error) {
+        return ResponseMes(401, "Invalid Auth")
+    }
+    // ----------------------- Secure Request Without Bearer Token End --------------------------
+
     try {
         const url = new URL(req.url);
         const type = url.searchParams.get('type');

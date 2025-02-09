@@ -1,18 +1,36 @@
 // import { PrismaClient } from "@prisma/client";
 // import { PrismaClient } from '../prisma/generated/clientPg'
 // import { PrismaClient } from '../prisma/generated/clientPg';
-import prisma from "@/lib/Prisma";
+// import prisma from "@/lib/Prisma";
+import { ResponseMes, verificationAuthor } from "@/lib/Globalfunction";
+import { TokenDecoded } from "@/lib/tokenHelper";
+import { PrismaClient } from "@prisma/client";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 
-// const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
-// client add
+// Client Add
 export async function POST(req, res) {
+  const reqData = await req.json();
+
+  // ----------------------- Secure Request Without Bearer Token Start--------------------------
+  const headersList = req.headers;
+  const authHeader = headersList.get("authorization");
 
   try {
-    const reqData = await req.json(); // Parse the incoming request JSON data
+    const data = await verificationAuthor(authHeader);
+    if (data === false) {
+      return ResponseMes(401, "Unauthorized: Token mismatch or user not found")
+    }
+  } catch (error) {
+    return ResponseMes(401, "Invalid Auth")
+  }
+  // ----------------------- Secure Request Without Bearer Token End --------------------------
 
+
+  try {
     const newCustomer = await prisma.client.create({
       data: {
         fullname: reqData.name,
@@ -20,76 +38,92 @@ export async function POST(req, res) {
         address: reqData.address,
       },
     });
-
-
     return NextResponse.json({ status: "ok", data: newCustomer });
-
   } catch (error) {
-    console.log("Error creating customer:", error.message);
-    return NextResponse.json({
-      status: 500,
-      error: "Failed to create customer!",
-    });
+    return ResponseMes(400, "Error creating Client, something wroing error!")
   }
 }
 
 
-// all client get
+
+
+// All Client Get
 export async function GET(req, res) {
+  const url = new URL(req.url);
+  const page = parseInt(url.searchParams.get("page") || "1");
+  const limit = parseInt(url.searchParams.get("limit") || "10");
+
+  // ----------------------- Secure Request Without Bearer Token Start --------------------------
+  const headersList = req.headers;
+  const authHeader = headersList.get("authorization");
+
   try {
-    const url = new URL(req.url);
-    const page = parseInt(url.searchParams.get("page") || "1"); // Default to page 1 if not provided
-    const limit = parseInt(url.searchParams.get("limit") || "10"); // Default to 10 items per page if not provided
+    const data = await verificationAuthor(authHeader);
+    if (data === false) {
+      return ResponseMes(401, "Unauthorized: Token mismatch or user not found")
+    } else {
+      try {
+        // Calculate offset (skip)
+        const skip = (page - 1) * limit;
 
-    // Calculate offset (skip)
-    const skip = (page - 1) * limit;
+        // Fetch client data
+        const clientsData = await prisma.client.findMany({
+          where: {
+            NOT: {
+              fullname: null,
+            },
+          },
+          skip: skip,
+          take: limit,
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
 
-    const clientsData = await prisma.client.findMany({
-      where: {
-        NOT: {
-          fullname: null
-        }
-      },
-      skip: skip, // Skip records based on current page
-      take: limit, // Limit the number of records per page
-      orderBy:{
-        createdAt: 'desc'
+        // Optionally, get the total count of clients to calculate total pages
+        const totalClients = clientsData.length;
+        const totalPages = Math.ceil(totalClients / limit); // Calculate total pages
+
+        return NextResponse.json({
+          status: "ok",
+          data: clientsData,
+          pagination: {
+            totalClients,
+            totalPages,
+            currentPage: page,
+            limit,
+          },
+        });
+      } catch (error) {
+        return NextResponse.json({
+          status: 500,
+          error: "Failed to fetch clients. Internal server error.",
+        });
       }
-    });
-
-    // Optionally, get the total count of clients to calculate total pages
-    const totalClients = await prisma.client.count({
-      where: {
-        NOT: {
-          fullname: null,
-        },
-      },
-    });
-
-
-    const totalPages = Math.ceil(totalClients / limit); // Calculate total pages
-
-
-    return NextResponse.json({
-      status: "ok", data: clientsData, pagination: {
-        totalClients,
-        totalPages,
-        currentPage: page,
-        limit,
-      },
-    });
+    }
   } catch (error) {
-    console.log("Error creating customer:", error.message);
-    return NextResponse.json({
-      status: 500,
-      error: "Failed to create customer!",
-    });
+    return ResponseMes(401, "Invalid Auth")
   }
 }
 
 
-// all client get with full-name,id
+
+// All Client Get With full-name,id
 export async function PATCH(req, res) {
+
+  // ----------------------- Secure Request Without Bearer Token Start--------------------------
+  const headersList = req.headers;
+  const authHeader = headersList.get("authorization");
+
+  try {
+    const data = await verificationAuthor(authHeader);
+    if (data === false) {
+      return ResponseMes(401, "Unauthorized: Token mismatch or user not found")
+    }
+  } catch (error) {
+    return ResponseMes(401, "Unauthorized: Invalid Auth")
+  }
+  // ----------------------- Secure Request Without Bearer Token End --------------------------
   try {
     const clientData = await prisma.client.findMany({
       select: {
