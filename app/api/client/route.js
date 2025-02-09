@@ -1,6 +1,11 @@
-
+// import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from '../prisma/generated/clientPg'
+// import { PrismaClient } from '../prisma/generated/clientPg';
+// import prisma from "@/lib/Prisma";
 import { ResponseMes, verificationAuthor } from "@/lib/Globalfunction";
+import { TokenDecoded } from "@/lib/tokenHelper";
 import { PrismaClient } from "@prisma/client";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 
@@ -119,6 +124,7 @@ export async function PATCH(req, res) {
     return ResponseMes(401, "Unauthorized: Invalid Auth")
   }
   // ----------------------- Secure Request Without Bearer Token End --------------------------
+
   try {
     const clientData = await prisma.client.findMany({
       select: {
