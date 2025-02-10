@@ -4,7 +4,7 @@ import { ResponseMes, verificationAuthor } from "@/lib/Globalfunction";
 import { NextResponse } from "next/server";
 
 
-// const prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
 
 
