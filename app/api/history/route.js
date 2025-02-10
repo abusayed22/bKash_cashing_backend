@@ -16,6 +16,7 @@ export async function GET(req, res) {
 
     try {
         const data = await verificationAuthor(authHeader);
+        console.log(data);
         if (data === false) {
             return ResponseMes(401, "Unauthorized: Token mismatch or user not found")
         }
