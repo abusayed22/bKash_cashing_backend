@@ -1,3 +1,5 @@
+import { hashPassword } from "@/lib/passwordHandler";
+import { EncodedPassword } from "@/lib/tokenHelper";
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 
@@ -10,7 +12,6 @@ export const POST = async (req,res) => {
     try {
         let dataObj = await req.json();
         dataObj['otp'] = 0;
-        console.log(dataObj)
 
         // check user exist
         const existingUser = await prisma.admin.findUnique({
@@ -18,12 +19,20 @@ export const POST = async (req,res) => {
                 email: dataObj.email,
             }
         });
+        // console.log(existingUser)
 
         if (existingUser) {
-            return NextResponse.json({ Error: 'User already exists, please login' }, { status: 400 });
+            // console.log('User already exists, please login!')
+            return NextResponse.json({ Error: 'User already exists, please login!' }, { status: 400 });
         }
 
+        // password encoded
+        const hashedPassword = await hashPassword(dataObj.password);
+        console.log(hashedPassword);
 
+        if(!hashedPassword) {
+            return NextResponse.json({ Error: 'Password Hashed error' }, { status: 400 });
+        }
 
          
         // Create a new user in the database
@@ -31,10 +40,15 @@ export const POST = async (req,res) => {
             data: {
                 fullname: dataObj.fullName,
                 email: dataObj.email,
-                password: dataObj.password, 
+                password: hashedPassword, 
                 otp: '0',
                 token: ''
             },
+            select:{
+                fullname:true,
+                email:true,
+                password:true
+            }
         });
                 
 
