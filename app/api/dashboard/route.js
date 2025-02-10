@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 import { ResponseMes, verificationAuthor } from "@/lib/Globalfunction";
-// import prisma from "@/lib/Prisma";
+import prisma from "@/lib/Prisma";
 import { NextResponse } from "next/server";
 
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 
 
