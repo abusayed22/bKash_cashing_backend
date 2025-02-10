@@ -17,7 +17,7 @@ export const POST = async (req) => {
         const { email, password } = await req.json();
 
         const existingUser = await prisma.admin.findUnique({
-            where: { email },
+            where: { email:email,password:password },
         });
 
         if (!existingUser) {
@@ -35,7 +35,8 @@ export const POST = async (req) => {
         await prisma.admin.update({
             where: {
                 id: parseInt(existingUser.id),
-                email: existingUser.email
+                email: existingUser.email,
+                password: password
             },
             data: {
                 token: token,
