@@ -114,6 +114,7 @@ export async function PATCH(req, res) {
   // ----------------------- Secure Request Without Bearer Token Start--------------------------
   const headersList = req.headers;
   const authHeader = headersList.get("authorization");
+  console.log(authHeader)
 
   try {
     const data = await verificationAuthor(authHeader);
