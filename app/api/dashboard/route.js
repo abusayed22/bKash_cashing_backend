@@ -59,7 +59,7 @@ export const GET = async (req) => {
         const todayTotalReceivedAmount = todayTotalReceived._sum.amount;
 
 
-        //  today total Bank send amount 
+        //  today total bKash send amount 
         const todayTotalSendbkash = await prisma.history.aggregate({
             _sum: {
                 amount: true
@@ -69,7 +69,7 @@ export const GET = async (req) => {
                     gte: todayStart,
                     lte: todayEnd
                 },
-                method: 'bank',
+                method: 'b',
                 status: 'Send'
             }
         })
