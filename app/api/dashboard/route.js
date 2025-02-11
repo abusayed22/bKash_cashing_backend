@@ -9,7 +9,7 @@ import { NextResponse } from "next/server";
 
 
 export const GET = async (req) => {
-   
+   console.log('dashboard start')
      // ----------------------- Secure Request Without Bearer Token Start--------------------------
       const headersList = req.headers;
       const authHeader = headersList.get("authorization");
